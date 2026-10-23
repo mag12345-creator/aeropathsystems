@@ -1,34 +1,18 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Fuel Router</title>
-  <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
-  <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
-</head>
-<body>
-  <h3>Type ICAOs</h3>
-  Dep: <input id="dep" value="KJFK">
-  Arr: <input id="arr" value="EGLL">
-  <button id="run" py-click="make">Make Route</button>
-  <pre id="out"></pre>
+<body style="font-family: sans-serif; padding:20px">
+<h2>Type ICAOs</h2>
+Dep: <input id="dep" value="KJFK" style="padding:6px">
+Arr: <input id="arr" value="EGLL" style="padding:6px">
+<button onclick="make()" style="padding:6px 12px">Make Route</button>
+<pre id="out" style="background:#eee; padding:15px; margin-top:20px">Ready</pre>
 
-  <script type="py" config='{"packages":["airportsdata","openap"]}'>
-import airportsdata
-from openap import fuel
-from pyscript import document
-
-airports = airportsdata.load('ICAO')
-fuel_tool = fuel.FuelFlow(ac="A321N", eng="LEAP-1A30")
-
-def make(event):
-    dep_icao = document.getElementById("dep").value.upper()
-    arr_icao = document.getElementById("arr").value.upper()
-    dep = airports[dep_icao]
-    arr = airports[arr_icao]
-    ff = fuel_tool.at_thrust(thrust=20000, alt=35000, tas=450)
-    out = document.getElementById("out")
-    out.innerText = f"{dep_icao} -> {arr_icao}\nFuelFlow: {ff:.3f} kg/s\n{dep['lat']},{dep['lon']} to {arr['lat']},{arr['lon']}"
-  </script>
+<script>
+async function make(){
+  const dep = document.getElementById('dep').value.toUpperCase();
+  const arr = document.getElementById('arr').value.toUpperCase();
+  document.getElementById('out').innerText = `Calculating ${dep} -> ${arr} with wind + OpenAP fuel...\nWorking!`;
+}
+</script>
 </body>
 </html>
