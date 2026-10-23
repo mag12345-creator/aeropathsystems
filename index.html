@@ -1,37 +1,34 @@
 <!DOCTYPE html>
 <html>
-<head><title>Fuel Router</title></head>
+<head>
+  <meta charset="utf-8">
+  <title>Fuel Router</title>
+  <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+  <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+</head>
 <body>
-<h2>Type ICAOs</h2>
-Dep: <input id="dep" value="KJFK">
-Arr: <input id="arr" value="EGLL">
-<button id="run">Make Route</button>
-<pre id="out"></pre>
+  <h3>Type ICAOs</h3>
+  Dep: <input id="dep" value="KJFK">
+  Arr: <input id="arr" value="EGLL">
+  <button id="run" py-click="make">Make Route</button>
+  <pre id="out"></pre>
 
-<link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css"/>
-<script defer src="https://pyscript.net/latest/pyscript.js"></script>
-
-<py-config>
-packages = ["airportsdata", "openap"]
-</py-config>
-
-<py-script>
-import airportsdata, math
+  <script type="py" config='{"packages":["airportsdata","openap"]}'>
+import airportsdata
 from openap import fuel
+from pyscript import document
 
 airports = airportsdata.load('ICAO')
 fuel_tool = fuel.FuelFlow(ac="A321N", eng="LEAP-1A30")
 
-def make(e):
-    dep_icao = Element("dep").value.upper()
-    arr_icao = Element("arr").value.upper()
+def make(event):
+    dep_icao = document.getElementById("dep").value.upper()
+    arr_icao = document.getElementById("arr").value.upper()
     dep = airports[dep_icao]
     arr = airports[arr_icao]
     ff = fuel_tool.at_thrust(thrust=20000, alt=35000, tas=450)
-    Element("out").write(f"{dep_icao} -> {arr_icao}\nFuelFlow (OpenAP): {ff:.3f} kg/s\n{dep['lat']},{dep['lon']} to {arr['lat']},{arr['lon']}")
-
-from pyodide.ffi import create_proxy
-Element("run").element.addEventListener("click", create_proxy(make))
-</py-script>
+    out = document.getElementById("out")
+    out.innerText = f"{dep_icao} -> {arr_icao}\nFuelFlow: {ff:.3f} kg/s\n{dep['lat']},{dep['lon']} to {arr['lat']},{arr['lon']}"
+  </script>
 </body>
 </html>
