@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head><title>Fuel Router</title></head>
+<body>
+<h2>Type ICAOs</h2>
+Dep: <input id="dep" value="KJFK">
+Arr: <input id="arr" value="EGLL">
+<button id="run">Make Route</button>
+<pre id="out"></pre>
+
+<link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css"/>
+<script defer src="https://pyscript.net/latest/pyscript.js"></script>
+
+<py-config>
+packages = ["airportsdata", "openap"]
+</py-config>
+
+<py-script>
+import airportsdata, math
+from openap import fuel
+
+airports = airportsdata.load('ICAO')
+fuel_tool = fuel.FuelFlow(ac="A321N", eng="LEAP-1A30")
+
+def make(e):
+    dep_icao = Element("dep").value.upper()
+    arr_icao = Element("arr").value.upper()
+    dep = airports[dep_icao]
+    arr = airports[arr_icao]
+    ff = fuel_tool.at_thrust(thrust=20000, alt=35000, tas=450)
+    Element("out").write(f"{dep_icao} -> {arr_icao}\nFuelFlow (OpenAP): {ff:.3f} kg/s\n{dep['lat']},{dep['lon']} to {arr['lat']},{arr['lon']}")
+
+from pyodide.ffi import create_proxy
+Element("run").element.addEventListener("click", create_proxy(make))
+</py-script>
+</body>
+</html>
